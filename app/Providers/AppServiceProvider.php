@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(3)
+            return Limit::perMinute(100)
                 ->by(optional($request->user())->id ?: $request->ip());
         });
         date_default_timezone_set('Asia/Dushanbe');

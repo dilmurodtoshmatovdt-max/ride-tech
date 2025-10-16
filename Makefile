@@ -3,7 +3,7 @@ ifneq (,$(wildcard ./.env))
 	export
 endif
 
-run: up composer migration seed permission
+run: up
 
 up:
 	docker compose \

@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Services\Shared\Auth\AuthService;
 use Tests\TestCase;
 
 class TripTest extends TestCase
@@ -11,14 +10,13 @@ class TripTest extends TestCase
     /**
      * A basic feature test example.
      */
-    protected AuthService $authService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         require base_path('routes/ApiRoutes/TripRoute.php');
-        $this->authService = app(AuthService::class);
+        require base_path('routes/ApiRoutes/CarRoute.php');
     }
     public function test_example(): void
     {
@@ -27,7 +25,7 @@ class TripTest extends TestCase
 
         //Create Trip
         $responsePost = $this->actingAs($passenger, 'api')
-            ->post('/v1/trips', [
+            ->post('v1/trips', [
                 'from_address' => 'test from address',
                 'to_address' => 'test to address',
                 'preferences' => 'air condition'
@@ -41,7 +39,7 @@ class TripTest extends TestCase
 
         //Update Trip
         $responseUpdate = $this->actingAs($passenger, 'api')
-            ->put('/v1/trips/' . $trip->data->id, [
+            ->put('v1/trips/' . $trip->data->id, [
                 'from_address' => 'changed test from address',
                 'to_address' => 'changed test to address',
                 'preferences' => 'changed air condition'
@@ -51,9 +49,18 @@ class TripTest extends TestCase
             'code' => 0,
         ]);
 
+        $responseCar = $this->actingAs($driver, 'api')
+            ->get('v1/cars');
+
+        $responseCar->assertStatus(200)->assertJson([
+            'code' => 0,
+        ]);
+
+        $cars = json_decode($responseCar->getContent());
+
         //Assign Trip
         $responseAssign = $this->actingAs($driver, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/assign', ['car_id' => 1]);
+            ->put('v1/trips/' . $trip->data->id . '/assign', ['car_id' => $cars->data[0]->id]);
 
         $responseAssign->assertStatus(200)->assertJson([
             'code' => 0,
@@ -61,7 +68,7 @@ class TripTest extends TestCase
 
         //Arrive Trip
         $responseArrive = $this->actingAs($driver, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/arrive');
+            ->put('v1/trips/' . $trip->data->id . '/arrive');
 
         $responseArrive->assertStatus(200)->assertJson([
             'code' => 0,
@@ -69,7 +76,7 @@ class TripTest extends TestCase
 
         //Start Trip
         $responseStart = $this->actingAs($driver, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/start');
+            ->put('v1/trips/' . $trip->data->id . '/start');
 
         $responseStart->assertStatus(200)->assertJson([
             'code' => 0,
@@ -77,7 +84,7 @@ class TripTest extends TestCase
 
         //Finish Trip
         $responseFinish = $this->actingAs($driver, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/finish');
+            ->put('v1/trips/' . $trip->data->id . '/finish');
 
         $responseFinish->assertStatus(200)->assertJson([
             'code' => 0,
@@ -85,7 +92,7 @@ class TripTest extends TestCase
 
         //Cancel Trip By Passenger
         $responseCancel = $this->actingAs($passenger, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/cancel');
+            ->put('v1/trips/' . $trip->data->id . '/cancel');
 
         $responseCancel->assertStatus(200)->assertJson([
             'code' => -8,
@@ -93,7 +100,7 @@ class TripTest extends TestCase
 
         //Reject Trip By Driver
         $responseReject = $this->actingAs($driver, 'api')
-            ->put('/v1/trips/' . $trip->data->id . '/reject');
+            ->put('v1/trips/' . $trip->data->id . '/reject');
 
         $responseReject->assertStatus(200)->assertJson([
             'code' => -8,

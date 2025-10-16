@@ -35,7 +35,7 @@ class TestUserSeeder extends Seeder
             User::create($driver);
             User::create($passenger);
             RoleUser::create(['role_id' => Roles::DRIVER, 'user_id' => $driver['id'], 'user_type' => User::class]);
-            RoleUser::create(['role_id' => Roles::PASSANGER, 'user_id' => $driver['id'], 'user_type' => User::class]);
+            RoleUser::create(['role_id' => Roles::PASSANGER, 'user_id' => $passenger['id'], 'user_type' => User::class]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

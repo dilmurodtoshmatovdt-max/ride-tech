@@ -263,7 +263,6 @@ class JwtGuard implements Guard
     public function validate(array $credentials = array())
     {
         $user = $this->provider->retrieveByCredentials($credentials);
-
         if (!is_null($user) && $this->provider->validateCredentials($user, $credentials)) {
             $this->setUser($user);
             return true;

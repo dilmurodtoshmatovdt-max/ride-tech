@@ -52,32 +52,32 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof ExpiredException) {
                 $data['code'] = StatusCodes::TOKEN_EXPIRED_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                 $statusCode = 200;
             } elseif ($e instanceof AuthenticationException) {
                 $data['code'] = StatusCodes::AUTHENTICATION_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                 $statusCode = 200;
             } elseif ($e instanceof ThrottleRequestsException) {
                 $data['code'] = StatusCodes::TO_MANY_ATTEMPT_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                 $statusCode = 200;
             } elseif ($e instanceof ValidationException) {
                 $data['code'] = StatusCodes::VALIDATION_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->errors : [];
+                //$data['errors'] = app()->isLocal() ? $e->errors : [];
                 $statusCode = 200;
             } elseif ($e instanceof LaravelValidationException) {
                 $data['code'] = StatusCodes::VALIDATION_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->errors() : [];
+                //$data['errors'] = app()->isLocal() ? $e->errors() : [];
                 $statusCode = 200;
             } elseif ($e instanceof ModelNotFoundException) {
                 $data['code'] = StatusCodes::NOT_FOUND_ERROR;
                 $data['message'] = __($e->getMessage());
-                $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                 $statusCode = 200;
             } elseif ($e instanceof BaseException) {
                 return $e->render();
@@ -85,13 +85,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($e->errorInfo[1] == 1062) {
                     $data['code'] = StatusCodes::VALIDATION_ERROR;
                     $data['message'] = __("Dublicate entery") . explode(" ", $e->errorInfo[2])[2] . "," . __("enter another value");
-                    $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                    //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                     $statusCode = 200;
                 }
                 if ($e->errorInfo[1] == 1452) {
                     $data['code'] = StatusCodes::VALIDATION_ERROR;
                     $data['message'] = __("This parameter is not in the database! Please select from the directory");
-                    $data['errors'] = app()->isLocal() ? $e->getTrace() : [];
+                    //$data['errors'] = app()->isLocal() ? $e->getTrace() : [];
                     $statusCode = 200;
                 }
             }
