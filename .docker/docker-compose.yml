@@ -1,0 +1,86 @@
+version: "3.8"
+
+services:
+    app:
+        build:
+            args:
+                user: dev
+                uid: 1000
+            context: .
+            dockerfile: ./php/Dockerfile
+        container_name: ${APP_NAME}-app
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_started
+        tty: true
+        ports:
+            - 8000:8000
+        working_dir: /var/www/app
+        command: sh -c "composer update && OCTANE_HTTPS=true /usr/local/bin/php artisan octane:start ${APP_VERBOSE} ${APP_WATCH} --server=${OCTANE_SERVER} --host=${APP_HOST} --port=${APP_PORT} --workers=5"
+        volumes:
+            - ../:/var/www/app
+            - ./nginx/ssl/:/etc/nginx/ssl/
+        networks:
+            - app-network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    #Redis Service
+    redis:
+        image: bitnami/redis
+        container_name: ${APP_NAME}-redis
+        restart: unless-stopped
+        environment:
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+        ports:
+            - "${REDIS_PORT}:6379"
+        networks:
+            - app-network
+
+
+    #MySQL Service
+    db:
+        image: mysql:8
+        container_name: ${APP_NAME}-db
+        restart: always
+        tty: true
+        ports:
+            - "${DB_PORT}:3306"
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        volumes:
+            - ./mysql/data:/var/lib/mysql/
+            #- db-data:/var/lib/mysql/
+            - ./mysql/my.cnf:/etc/mysql/my.cnf
+            - ./mysql/log:/var/log/mysql
+        networks:
+            - app-network
+
+    #PHPMyAdmin Service
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: ${APP_NAME}-pma
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        restart: always
+        ports:
+            - ${PMA_PORT}:80
+        networks:
+            - app-network
+
+#Docker Networks
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    db-data:
+
+
